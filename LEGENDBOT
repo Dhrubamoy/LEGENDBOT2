@@ -1,0 +1,45 @@
+#!/bin/bash
+
+
+_repolink () {
+    local regex
+    regex='(https?)://github.com/.+/.+'
+    if [[ $LEGEND_REPO == "LEGENDBOT" ]]
+    then
+        echo "aHR0cHM6Ly9naXRodWIuY29tL0xFR0VORC1CT1QvTEVHRU5EVVNFUkJPVC9hcmNoaXZlL21hc3Rlci56aXA=" | base64 -d
+    elif [[ $LEGEND_REPO == "LEGENDBOT" ]]
+    then
+        echo "aHR0cHM6Ly9naXRodWIuY29tL0xFR0VORC1CT1QvTEVHRU5EVVNFUkJPVC9hcmNoaXZlL21hc3Rlci56aXA=" | base64 -d
+    elif [[ $LEGEND_REPO =~ $regex ]]
+    then
+        if [[ $LEGEND_REPO_BRANCH ]]
+        then
+            echo "${LEGEND_REPO}/archive/${LEGEND_REPO_BRANCH}.zip"
+        else
+            echo "${LEGEND_REPO}/archive/master.zip"
+        fi
+    else
+        echo "aHR0cHM6Ly9naXRodWIuY29tL0xFR0VORC1CT1QvTEVHRU5EVVNFUkJPVC9hcmNoaXZlL21hc3Rlci56aXA=" | base64 -d
+    fi
+}
+
+
+start_bot () {
+    local zippath
+    zippath="mylegendbot.zip"
+    echo "  Downloading source code ..."
+    wget -q $(_repolink) -O "$zippath"
+    echo "  Unpacking Data ..."
+    LEGENDPATH=$(zipinfo -1 "$zippath" | grep -v "/.");
+    unzip -qq "$zippath"
+    echo "  Processing Codes..."
+    rm -rf "$zippath"
+    sleep 5
+    cd $LEGENDPATH
+    echo "  • Starting LegendBot•  "
+
+    python3 ../setup/updater.py ../requirements.txt requirements.txt
+    python3 -m userbot
+}
+
+start_bot
